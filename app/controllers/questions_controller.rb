@@ -3,7 +3,7 @@ class QuestionsController < ApplicationController
 
   def show
     @answer = @question.answers.build
-    @answers = @question.answers.order created_at: :desc
+    @answers = @question.answers.order(created_at: :desc).page(params[:page]).per(2)
   end
 
   def destroy
@@ -13,7 +13,7 @@ class QuestionsController < ApplicationController
   end
 
   def index
-    @questions = Question.all
+    @questions = Question.order(created_at: :desc).page(params[:page]).per(10)
   end
 
   def new
