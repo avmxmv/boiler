@@ -1,11 +1,13 @@
 class AnswersController < ApplicationController
+  include ActionView::RecordIdentifier
+
   before_action :set_question!
   before_action :set_answer!, except: :create
 
   def update
     if @answer.update answer_params
       flash[:success] = "Answer updated!"
-      redirect_to question_path(@question, anchor: "answer-#{@answer.id}")
+      redirect_to question_path(@question, anchor: dom_id(@answer))
     else
       render :edit
     end
@@ -19,7 +21,7 @@ class AnswersController < ApplicationController
 
     if @answer.save
       flash[:success] = "Answer created!"
-      redirect_to question_path(@question, anchor: "answer-#{@answer.id}")
+      redirect_to question_path(@question, anchor: dom_id(@answer))
     else
       @answers = @question.answers.order created_at: :desc
       render 'questions/show'
