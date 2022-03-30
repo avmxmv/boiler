@@ -1,19 +1,26 @@
+# frozen_string_literal: true
+
 class QuestionsController < ApplicationController
   before_action :set_question!, only: %i[show destroy edit update]
 
   def show
+    @question = @question.decorate
     @answer = @question.answers.build
-    @answers = @question.answers.order(created_at: :desc).page(params[:page]).per(2)
+    @pagy, @answers = pagy @question.answers.order(created_at: :desc)
+    @answers = @answers.decorate
+    # .page(params[:page]).per(2)
   end
 
   def destroy
     @question.destroy
-    flash[:success] = "Question deleted!"
+    flash[:success] = 'Question deleted!'
     redirect_to questions_path
   end
 
   def index
-    @questions = Question.order(created_at: :desc).page(params[:page]).per(10)
+    @pagy, @questions = pagy Question.order(created_at: :desc)
+    @questions = @questions.decorate
+    # Question.order(created_at: :desc).page(params[:page])
   end
 
   def new
@@ -23,19 +30,18 @@ class QuestionsController < ApplicationController
   def create
     @question = Question.new question_params
     if @question.save
-      flash[:success] = "Question created!"
+      flash[:success] = 'Question created!'
       redirect_to questions_path
     else
       render :new
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @question.update question_params
-      flash[:success] = "Question updated!"
+      flash[:success] = 'Question updated!'
       redirect_to questions_path
     else
       render :edit
